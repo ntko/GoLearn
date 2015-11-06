@@ -208,7 +208,7 @@ Go支持嵌套数组：
 
 #### 基础:方法集
 
-> **方法集是一个定义儿不是类型.方法集,或者叫做成员方法,是一个类型的函数集合.需要注意的是,T的方法集,就是带有接收器T类型的方法,而其对应的指针类型\*T的方法集,则包括了接收器T和\*T的方法.**
+> **方法集是一个定义而不是类型.方法集,或者叫做成员方法,是一个类型的函数集合.需要注意的是,T的方法集,就是带有接收器T类型的方法,而其对应的指针类型\*T的方法集,则包括了接收器T和\*T的方法.**
 
 #### 错误类型
 Go内置有一个`error`类型，专门用来处理错误信息，Go的`package`里面还专门有一个包`errors`来处理错误：
@@ -329,7 +329,7 @@ function类型标识了具有相同参数和返回值的函数集合.未初始�
 
 #### Interface类型
 
-interface类型定义了一组叫做接口的方法.interface类型的变量可以存储任何实现了该接口方法集的超集的类型.该类型就是实现了该接口.未初始化的Interface类型的变量值为nil.
+interface类型定义了一组接口方法.interface类型的变量,可以存储任何实现了该组接口方法的类型.且该类型就叫做实现了该接口.未初始化的Interface类型的变量值为nil.
 
 >**Go语言取消了C++中相对复杂的接口定义及实现.直接使用如下原则:**
 >
@@ -590,5 +590,80 @@ Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值
 
 ### 类型断言
 
+对于interface类型变量x,以及类型T:
+
+	x.(T)
+
+断言x不是nil,并且x中存储的值是类型T.更准确的说:
+
+* 如果T不是一个interface类型,x.(T)断言动态类型x,和类型T等同.这时,T必须实现x.否则,断言不成立,因为x无法存储一个T类型的值.
+
+* 反之,如果T是一个interface类型,x.(T)则断言,x必须实现了接口T.
+
+如果断言成立,该表达式的值是类型为T的x的值,否则,**会发生运行时错误.**
+
+	var x interface{} = 7  // x has dynamic type int and value 7
+	i := x.(int)           // i has type int and value 7
+	
+	type I interface { m() }
+	var y I
+	s := y.(string)        // illegal: string does not implement I (missing method m)
+	r := y.(io.Reader)     // r has type io.Reader and y must implement both I and io.Reader
+
+在赋值和初始化有个特殊形态的断言:
+
+	v, ok = x.(T)
+	v, ok := x.(T)
+	var v, ok = x.(T)
+
+这时蒋产生一个附加的bool值.该布尔值标识断言是否成立.如果成立,v保存了T类型的x的值,如果不成立,v保存了T类型的0值.**此时将不会有运行时错误**.
+
 
 ### 类型分支
+
+x是一个interface{}类型, 如下类型分支代码: 
+
+	switch i := x.(type) {
+	case nil:
+		printString("x is nil")                // type of i is type of x (interface{})
+	case int:
+		printInt(i)                            // type of i is int
+	case float64:
+		printFloat64(i)                        // type of i is float64
+	case func(int) float64:
+		printFunction(i)                       // type of i is func(int) float64
+	case bool, string:
+		printString("type is bool or string")  // type of i is type of x (interface{})
+	default:
+		printString("don't know the type")     // type of i is type of x (interface{})
+	}
+
+
+也可以被这样重写: 
+	
+	v := x  // x is evaluated exactly once
+	if v == nil {
+		i := v                                 // type of i is type of x (interface{})
+		printString("x is nil")
+	} else if i, isInt := v.(int); isInt {
+		printInt(i)                            // type of i is int
+	} else if i, isFloat64 := v.(float64); isFloat64 {
+		printFloat64(i)                        // type of i is float64
+	} else if i, isFunc := v.(func(int) float64); isFunc {
+		printFunction(i)                       // type of i is func(int) float64
+	} else {
+		_, isBool := v.(bool)
+		_, isString := v.(string)
+		if isBool || isString {
+			i := v                         // type of i is type of x (interface{})
+			printString("type is bool or string")
+		} else {
+			i := v                         // type of i is type of x (interface{})
+			printString("don't know the type")
+		}
+	}
+
+
+The type switch guard may be preceded by a simple statement, which executes before the guard is evaluated. 
+
+**The "fallthrough" statement is not permitted in a type switch.** 
