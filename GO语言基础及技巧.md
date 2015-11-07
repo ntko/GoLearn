@@ -361,15 +361,7 @@ interface类型定义了一组接口方法.interface类型的变量,可以存储
 
 #### Channel类型
 
-channel类型,通过发送和接收某种类型的值进行通讯的方式,提供了同步执行的机制.未初始化的channel类型的变量值为nil.可以被定义为双向和单向,且限定某种类型:
-
-	chan T          // 双向发送接收类型T的数据
-	chan<- float64  // 只能用来发送float64s
-	<-chan int      // 只能用来接收int
-
-初始化可以用make,可选容量100:
-
-	make(chan int, 100)
+参考后面[Go语言并发部分](#goconcurrent)
 
 #### slice类型
 
@@ -667,3 +659,144 @@ x是一个interface{}类型, 如下类型分支代码:
 The type switch guard may be preceded by a simple statement, which executes before the guard is evaluated. 
 
 **The "fallthrough" statement is not permitted in a type switch.** 
+
+## 反射(reflect)
+
+直接看示例:
+
+	var reflectTest float64 = 3.4
+	pv := reflect.ValueOf(&reflectTest)
+	
+	fmt.Println("type:",pv.Type())
+	fmt.Println("kind is float64:",pv.Kind() == reflect.Float64)
+	fmt.Println("Value:",pv)
+	
+	rv := pv.Elem()
+	rv.SetFloat(7.1)
+
+	fmt.Printf("reflectTest=%f\n",reflectTest)
+	
+	vv := reflect.ValueOf(reflectTest)
+	fmt.Println("type:",vv.Type())
+	fmt.Println("kind is float64:",vv.Kind() == reflect.Float64)
+	fmt.Println("Value:",vv.Float())
+
+以上代码输出:
+
+	type: *float64
+	kind is float64: false
+	Value: 0xc082008d50
+	reflectTest=7.100000
+	type: float64
+	kind is float64: true
+	Value: 7.1
+
+##Go语言并发
+
+###goroutine
+
+goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一个线程管理器。goroutine通过`go`关键字实现，其实就是一个普通的函数。
+
+	go hello(a, b, c)
+
+代码示例:
+
+	package main
+
+	import (
+		"fmt"
+		"runtime"
+	)
+
+	func say(s string) {
+		for i := 0; i < 3; i++ {
+			runtime.Gosched()
+			fmt.Println(s)
+		}
+	}
+
+	func main() {
+		go say("world") //开一个新的Goroutines执行
+		say("hello") //当前Goroutines执行
+	}
+
+	// 以上程序执行后将输出：
+	// hello
+	// world
+	// hello
+	// world
+	// hello
+
+> **注意:**尽管上面的多个goroutine运行在同一个进程里面，可以共享内存数据，不过设计上我们要遵循：**不要通过共享来通信，而要通过通信来共享。**
+
+> **runtime.Gosched()表示让CPU把时间片让给别人,下次某个时候继续恢复执行该goroutine。**
+
+>这里有一篇Rob介绍的关于并发和并行的文章：http://concur.rspace.googlecode.com/hg/talk/concur.html#landing-slide
+
+###Channel用于同步<a name="#goconcurrent"></a>
+
+channel可以与Unix shell 中的双向管道做类比：可以通过它发送或者接收特定类型的值。
+
+>**注意，必须使用make 创建channel：**
+
+	ci := make(chan int)
+	cs := make(chan string)
+	cf := make(chan interface{})
+
+channel通过操作符`<-`来接收和发送数据
+
+	ch <- v    // 发送v到channel ch.
+	v := <-ch  // 从ch中接收数据，并赋值给v
+
+我们把这些应用到我们的例子中来：
+
+	package main
+
+	import "fmt"
+
+	func sum(a []int, c chan int) {
+		total := 0
+		for _, v := range a {
+			total += v
+		}
+		c <- total  // send total to c
+	}
+
+	func main() {
+		a := []int{7, 2, 8, -9, 4, 0}
+
+		c := make(chan int)
+		go sum(a[:len(a)/2], c)
+		go sum(a[len(a)/2:], c)
+		x, y := <-c, <-c  // receive from c
+
+		fmt.Println(x, y, x + y)
+	}
+
+默认情况下，channel接收和发送数据都是阻塞的，除非另一端已经准备好，这样就使得Goroutines同步变的更加的简单，而不需要显式的lock。所谓阻塞，也就是如果读取（value := <-ch）它将会被阻塞，直到有数据接收。其次，任何发送（ch<-5）将会被阻塞，直到数据被读出。无缓冲channel是在多个goroutine之间同步很棒的工具。
+
+###select语句
+
+select语句
+
+	cccc := make(chan int)
+	oooo := make(chan bool)
+	go func() {
+		for {
+			select {
+			case v := <-cccc: //如果没有下面的匿名标号_:代码,永远不会触发
+				println("v=", v, " received.")
+			case <-time.After(3 * time.Second):
+				println("timeout")
+				oooo <- true
+				break
+			}
+		}
+	}()
+	
+	_:
+	for loopChan := 0; loopChan < 10; loopChan++ {
+		cccc <- loopChan
+	}
+	
+	<-oooo
