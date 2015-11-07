@@ -22,7 +22,7 @@
 
 
 
-#2.基础知识点
+#2.入门准备
 
 ##GOPATH设置
 
@@ -43,17 +43,81 @@ GOPATH下的src目录就是接下来开发的主要目录，所有源码都放�
 通过命令在命令行执行 godoc -http=:端口号 比如 godoc -http=:8080 。然后在浏览器中打开 127.0.0.1:8080 ，你将会看到一个golang.org的本地copy版本，通过它你可以查询pkg文档等其它内容。如果你设置了GOPATH，在pkg分类下，不但会列出标准包的文档，还会列出你本地 GOPATH 中所有项目的相关文档。
 
 
-## 程序基础
+#3.程序基础
 
-###程序入口及编码
+##程序入口
 
-GO程序的入口是**`main.main()`**,也就是main pachage的main()函数。除了`main`包之外，其它的包最后都会生成`*.a`文件（也就是包文件）并放置在`$GOPATH/pkg/$GOOS_$GOARCH`中。
+#### `main`函数和`init`函数
 
->每一个可独立运行的Go程序，必定包含一个`package main`，在这个`main`包中必定包含一个入口函数`main`，而这个函数既没有参数，也没有返回值。
+Go里面有两个保留的函数：`init`函数（能够应用于所有的`package`）和`main`函数（只能应用于`package main`）。这两个函数在定义时不能有任何的参数和返回值。
+
+Go程序会自动调用`init()`和`main()`，所以你不需要在任何地方调用这两个函数。每个`package`中的`init`函数都是可选的，但`package main`就必须包含一个`main`函数。
+
+**GO程序的入口就是`main.main()`,也就是main pachage的main()函数。每一个可独立运行的Go程序，必定包含一个`package main`，在这个`main`包中必定包含一个入口函数`main`.除了`main`包之外，其它的包最后都会生成`*.a`文件（也就是包文件）并放置在`$GOPATH/pkg/$GOOS_$GOARCH`中。**
 
 >Go是天生支持UTF-8的，任何字符都可以直接输出，你甚至可以用UTF-8中的任何字符作为标识符。
 
-###变量定义
+程序的初始化和执行都起始于`main`包。如果`main`包还导入了其它的包，那么就会在编译时将它们依次导入。有时一个包会被多个包同时导入，那么它只会被导入一次.当一个包被导入时，如果该包还导入了其它的包，那么会先将其它包导入进来，然后再对这些包中的包级常量和变量进行初始化，接着执行`init`函数（如果有的话），依次类推。等所有被导入的包都加载完毕了，就会开始对`main`包中的包级常量和变量进行初始化，然后执行`main`包中的`init`函数（如果存在的话），最后执行`main`函数。下图详细地解释了整个执行过程：
+
+#### import
+
+import这个命令用来导入包文件，而我们经常看到的方式参考如下：
+
+	import(
+	    "fmt"
+	)
+
+然后我们代码里面可以通过如下的方式调用
+
+	fmt.Println("hello world")
+
+上面这个fmt是Go语言的标准库，其实是去`GOROOT`环境变量指定目录下去加载该模块，当然Go的import还支持如下两种方式来加载自己写的模块：
+
+1. 相对路径
+
+	import “./model” //当前文件同一目录的model目录，但是不建议这种方式来import
+
+2. 绝对路径
+
+	import “shorturl/model” //加载gopath/src/shorturl/model模块
+	
+	
+上面展示了一些import常用的几种方式，但是还有一些特殊的import，让很多新手很费解，下面我们来一一讲解一下到底是怎么一回事
+	
+	
+1. 点操作
+	
+	我们有时候会看到如下的方式导入包
+	
+		import(
+		    . "fmt"
+		)
+	
+	这个点操作的含义就是这个包导入之后在你调用这个包的函数时，你可以省略前缀的包名，也就是前面你调用的fmt.Println("hello world")可以省略的写成Println("hello world")
+
+2. 别名操作
+
+	别名操作顾名思义我们可以把包命名成另一个我们用起来容易记忆的名字
+	
+		import(
+		    f "fmt"
+		)
+		
+	别名操作的话调用包函数时前缀变成了我们的前缀，即f.Println("hello world")
+
+3. _操作
+
+	这个操作经常是让很多人费解的一个操作符，请看下面这个import
+	
+		import (
+		    "database/sql"
+		    _ "github.com/ziutek/mymysql/godrv"
+		)
+		
+	_操作其实是引入该包，而不直接使用包里面的函数，而是调用了该包里面的init函数。
+
+
+##变量定义
 
 >**Go的变量定义,类型type在变量名称之后。**
 
@@ -89,7 +153,7 @@ Go对于已声明但未使用的变量会在编译阶段报错，比如下面的
 		var i int
 	}
 
-###常量定义示范
+##常量定义示范
 
 	const a = 2 + 3.0          // a == 5.0   (untyped floating-point constant)
 	const b = 15 / 4           // b == 3     (untyped integer constant)
@@ -109,7 +173,7 @@ Go对于已声明但未使用的变量会在编译阶段报错，比如下面的
 	const Δ = Σ + 2.0e-4       //            (untyped complex constant)
 	const Φ = iota*1i - 1/1i   //            (untyped complex constant)
 
-###内置常规数据类型
+##内置常规数据类型
 
 #### bool
 
@@ -204,7 +268,7 @@ Go支持嵌套数组：
 	// 上面的声明可以简化，直接忽略内部的类型
 	easyArray := [2][4]int{{1, 2, 3, 4}, {5, 6, 7, 8}}
 
-###内置高级数据类型
+##内置高级数据类型
 
 #### 基础:方法集
 
@@ -444,8 +508,295 @@ slice有一些简便的操作
 
 >**注意: `map`也是一种引用类型.`map`和其他基本型别不同，它不是thread-safe，在多个go-routine存取时，必须使用mutex lock机制。**
 
+##程序语句
 
-#3.一般语言技巧
+###流程控制
+
+####if
+
+* Go里面if条件判断语句中不需要括号
+* Go的if还允许在条件判断语句里面声明一个变量，这个变量的作用域只能在该条件逻辑块内.
+
+		// 计算获取值x,然后根据x返回的大小，判断是否大于10。
+		if x := computedValue(); x > 10 {
+		    fmt.Println("x is greater than 10")
+		} else {
+		    fmt.Println("x is less than 10")
+		}
+
+
+#### goto
+
+用`goto`跳转到必须在当前函数内定义的标签,且标签名大小写敏感。
+
+#### for
+Go里面最强大的一个控制逻辑就是`for`，它即可以用来循环读取数据，又可以当作`while`来控制逻辑，还能迭代操作。它的语法如下：(**注意同样不需要括号**)
+
+	for expression1; expression2; expression3 {
+		//...
+	}
+
+`expression1`、`expression2`和`expression3`都是表达式，其中`expression1`和`expression3`是变量声明或者函数调用返回值之类的，`expression2`是用来条件判断，`expression1`在循环开始之前调用，`expression3`在每轮循环结束之时调用。
+
+* 基本形态: 
+
+		for index:=0; index < 10 ; index++ {
+			sum += index
+		}
+
+>**有些时候需要进行多个赋值操作，由于Go里面没有`,`操作符，那么可以使用平行赋值`i, j = i+1, j-1`**
+
+* 忽略`expression1`和`expression3`及`;`,等同于`while`的功能:
+
+		sum := 1
+		for sum < 1000 {
+			sum += sum
+		}
+
+>在循环里面有两个关键操作`break`和`continue`	,`break`操作是跳出当前循环，`continue`是跳过本次循环。当嵌套过深的时候，`break`和`continue`都可以配合标签使用，即跳转至标签所指定的位置,用来跳到多重循环中的外层循环.
+
+* `for`配合`range`可以用于读取`slice`和`map`的数据：
+
+		for k,v:=range map {
+			fmt.Println("map's key:",k)
+			fmt.Println("map's val:",v)
+		}
+
+* 由于 Go 支持 “多值返回”, 而对于“声明而未被调用”的变量, 编译器会报错, 在这种情况下, 可以使用`_`来丢弃不需要的返回值
+例如
+
+		for _, v := range map{
+			fmt.Println("map's val:", v)
+		}
+
+
+#### switch
+
+`switch`的语法如下:
+
+	switch sExpr {
+	case expr1:
+		some instructions
+	case expr2:
+		some other instructions
+	case expr3:
+		some other instructions
+	default:
+		other code
+	}
+
+`sExpr`和`expr1`、`expr2`、`expr3`的类型必须一致。表达式不必是常量或整数，执行的过程从上至下，直到找到匹配项；如果`switch`没有表达式，它会匹配`true`。
+
+* 我们可以把很多值聚合在了一个`case`里面，比如,`case 2, 3, 4:`
+
+* Go里面`switch`默认相当于每个`case`最后带有`break`，匹配成功后不会自动向下执行其他case，而是跳出整个`switch`, 但是可以使用`fallthrough`强制执行后面的case代码。
+
+## 函数
+
+函数是Go里面的核心设计，它通过关键字`func`来声明，它的格式如下：
+
+	func funcName(input1 type1, input2 type2) (output1 type1, output2 type2) {
+		//这里是处理逻辑代码
+		//返回多个值
+		return value1, value2
+	}
+
+
+
+- 关键字`func`用来声明一个函数`funcName`
+- **函数可以返回多个值**
+- 上面返回值声明了两个变量`output1`和`output2`，如果你不想声明也可以，直接就两个类型
+- 如果只有一个返回值且不声明返回值变量，那么你可以省略 包括返回值 的括号
+- 如果没有返回值，那么就直接省略最后的返回信息
+
+下面我们来看一个实际应用函数的例子（用来计算Max值）
+
+	// 返回a、b中最大值.
+	func max(a, b int) int {
+		if a > b {
+			return a
+		}
+		return b
+	}
+
+	//返回 A+B 和 A*B
+	func SumAndProduct(A, B int) (int, int) {
+		return A+B, A*B
+	}
+
+上面这个里面我们可以看到`max`函数有两个参数，它们的类型都是`int`，那么第一个变量的类型可以省略（即 a,b int,而非 a int, b int)，同理多于2个同类型的变量或者返回值。同时我们注意到它的返回值就是一个类型，这个就是省略写法。
+
+而SumAndProduct直接返回了两个参数.
+
+#### 变参
+
+	func myfunc(arg ...int) {}
+`arg ...int`告诉Go这个函数接受不定数量的参数。注意，这些参数的类型全部是`int`。在函数体中，变量`arg`是一个`int`的`slice`：
+
+	for _, n := range arg {
+		fmt.Printf("And the number is: %d\n", n)
+	}
+
+#### 传值与传指针
+
+Go语言中`channel`，`slice`，`map`这三种类型的实现机制类似指针，所以可以直接传递，而不用取地址后传递指针。（注：若函数需改变`slice`的长度，则仍需要取地址传递指针）
+
+#### defer
+
+Go语言中有种不错的设计，即延迟（defer）语句，你可以在函数中添加多个defer语句。当函数执行到最后时，这些defer语句会按照逆序执行,即采用后进先出模式，最后该函数返回。特别是当你在进行一些打开资源的操作时，遇到错误需要提前返回，在返回前你需要关闭相应的资源，不然很容易造成资源泄露等问题。示例：
+
+	func ReadWrite() bool {
+		file.Open("file")
+		defer file.Close()
+		if failureX {
+			return false
+		}
+		if failureY {
+			return false
+		}
+		return true
+	}
+
+#### 函数作为值、类型(函数指针)
+
+在Go中函数也是一种变量，我们可以通过`type`来定义它，它的类型就是所有拥有相同的参数，相同的返回值的一种类型
+
+	type typeName func(input1 inputType1 , input2 inputType2 [, ...]) (result1 resultType1 [, ...])
+
+函数作为类型到底有什么好处呢？那就是可以把这个类型的函数当做值来传递，请看下面的例子
+
+	package main
+	import "fmt"
+
+	type testInt func(int) bool // 声明了一个函数类型
+
+	func isOdd(integer int) bool {
+		if integer%2 == 0 {
+			return false
+		}
+		return true
+	}
+
+	func isEven(integer int) bool {
+		if integer%2 == 0 {
+			return true
+		}
+		return false
+	}
+
+	// 声明的函数类型在这个地方当做了一个参数
+
+	func filter(slice []int, f testInt) []int {
+		var result []int
+		for _, value := range slice {
+			if f(value) {
+				result = append(result, value)
+			}
+		}
+		return result
+	}
+
+	func main(){
+		slice := []int {1, 2, 3, 4, 5, 7}
+		fmt.Println("slice = ", slice)
+		odd := filter(slice, isOdd)    // 函数当做值来传递了
+		fmt.Println("Odd elements of slice are: ", odd)
+		even := filter(slice, isEven)  // 函数当做值来传递了
+		fmt.Println("Even elements of slice are: ", even)
+	}
+
+函数当做值和类型在我们写一些通用接口的时候非常有用。
+
+#### Panic和Recover
+
+Go没有异常机制，它不能抛出异常，而是使用了`panic`和`recover`机制。
+
+Panic
+>是一个内建函数，可以中断原有的控制流程，进入一个令人恐慌的流程中。当函数`F`调用`panic`，函数F的执行被中断，但是`F`中的延迟函数会正常执行，然后F返回到调用它的地方。在调用的地方，`F`的行为就像调用了`panic`。这一过程继续向上，直到发生`panic`的`goroutine`中所有调用的函数返回，此时程序退出。恐慌可以直接调用`panic`产生。也可以由运行时错误产生，例如访问越界的数组。
+
+Recover
+>是一个内建的函数，可以让进入令人恐慌的流程中的`goroutine`恢复过来。`recover`仅在延迟函数中有效。在正常的执行过程中，调用`recover`会返回`nil`，并且没有其它任何效果。如果当前的`goroutine`陷入恐慌，调用`recover`可以捕获到`panic`的输入值，并且恢复正常的执行。
+
+下面这个函数演示了如何在过程中使用`panic`
+
+	var user = os.Getenv("USER")
+
+	func init() {
+		if user == "" {
+			panic("no value for $USER")
+		}
+	}
+
+下面这个函数检查作为其参数的函数在执行时是否会产生`panic`：
+
+	func throwsPanic(f func()) (b bool) {
+		defer func() {
+			if x := recover(); x != nil {
+				b = true
+			}
+		}()
+		f() //执行函数f，如果f中出现了panic，那么就可以恢复回来
+		return
+	}
+
+##Method方法成员
+
+method的语法如下：
+
+	func (r ReceiverType) funcName(parameters) (results)
+
+用Rob Pike的话来说就是：
+>"A method is a function with an implicit first argument, called a receiver."
+>
+>**即:Method就是一个函数,它的第一个参数是隐含的,就是接收器.**
+
+
+另外：
+>如果一个method的receiver是*T,你可以在一个T类型的实例变量V上面调用这个method，而不需要&V去调用这个method
+
+类似的
+>如果一个method的receiver是T，你可以在一个*T类型的变量P上面调用这个method，而不需要 *P去调用这个method
+
+所以，你不用担心你是调用的指针的method还是不是指针的method，Go知道你要做的一切。
+
+#### method可以被继承和重写
+
+	package main
+	import "fmt"
+
+	type Human struct {
+		name string
+		age int
+		phone string
+	}
+
+	type Student struct {
+		Human //匿名字段
+		school string
+	}
+
+	type Employee struct {
+		Human //匿名字段
+		company string
+	}
+
+	//在human上面定义了一个method
+	func (h *Human) SayHi() {
+		fmt.Printf("Hi, I am %s you can call me on %s\n", h.name, h.phone)
+	}
+
+	func main() {
+		mark := Student{Human{"Mark", 25, "222-222-YYYY"}, "MIT"}
+		sam := Employee{Human{"Sam", 45, "111-888-XXXX"}, "Golang Inc"}
+
+		mark.SayHi()
+		sam.SayHi()
+	}
+
+上面的例子中，如果Employee想要实现自己的SayHi,在Employee上面定义一个method，重写匿名字段的方法即可。
+
+
+#4.一般语言技巧
 
 ## 零值
 关于“零值”，所指并非是空值，而是一种“变量未填充前”的默认值，通常为0。
@@ -576,7 +927,7 @@ Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值
 
 >`make`返回初始化后的（非零）值。
 
-#4.高级技巧
+#5.高级技巧
 
 ## 类型断言及类型分支(Type assertions及Type switches)
 
@@ -735,7 +1086,11 @@ goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一
 
 ###Channel用于同步<a name="goconcurrent"></a>
 
-channel可以与Unix shell 中的双向管道做类比：可以通过它发送或者接收特定类型的值。
+channel通过发送和接收某种类型的值进行通讯的方式,提供了同步执行的机制.未初始化的channel类型的变量值为nil.可以被定义为双向和单向,且限定可以通过它发送或者接收的数据类型.可以与Unix shell 中的双向管道做类比。
+
+	chan T          // 双向发送接收类型T的数据
+	chan<- float64  // 只能用来发送float64s
+	<-chan int      // 只能用来接收int
 
 >**注意，必须使用make 创建channel：**
 
@@ -748,36 +1103,62 @@ channel通过操作符`<-`来接收和发送数据
 	ch <- v    // 发送v到channel ch.
 	v := <-ch  // 从ch中接收数据，并赋值给v
 
-我们把这些应用到我们的例子中来：
+初始化可以用make,可选容量100:
+
+	make(chan int, 100)
+
+
+默认情况下，channel接收和发送数据都是阻塞的，除非另一端已经准备好，也就是如果读取（value := <-ch）它将会被阻塞，直到有数据接收。其次，任何发送（ch<-5）将会被阻塞，直到数据被读出。无缓冲channel是在多个goroutine之间同步很棒的工具。
+
+### Buffered Channels
+
+上面我们介绍了默认的非缓存类型的channel，不过Go也允许指定channel的缓冲大小，`ch:= make(chan bool, 4)`，创建了可以存储4个元素的bool 型channel。在这个channel 中，前4个元素可以无阻塞的写入。当写入第5个元素时，代码将会阻塞，直到其他goroutine从channel 中读取一些元素，腾出空间。
+
+	ch := make(chan type, value)
+
+	value == 0 ! 无缓冲（阻塞）
+	value > 0 ! 缓冲（非阻塞，直到value 个元素）
+
+
+### Range和Close
+
+可以通过range，像操作slice或者map一样操作缓存类型的channel，请看下面的例子
 
 	package main
 
-	import "fmt"
+	import (
+		"fmt"
+	)
 
-	func sum(a []int, c chan int) {
-		total := 0
-		for _, v := range a {
-			total += v
+	func fibonacci(n int, c chan int) {
+		x, y := 1, 1
+		for i := 0; i < n; i++ {
+			c <- x
+			x, y = y, x + y
 		}
-		c <- total  // send total to c
+		close(c)
 	}
 
 	func main() {
-		a := []int{7, 2, 8, -9, 4, 0}
-
-		c := make(chan int)
-		go sum(a[:len(a)/2], c)
-		go sum(a[len(a)/2:], c)
-		x, y := <-c, <-c  // receive from c
-
-		fmt.Println(x, y, x + y)
+		c := make(chan int, 10)
+		go fibonacci(cap(c), c)
+		for i := range c {
+			fmt.Println(i)
+		}
 	}
 
-默认情况下，channel接收和发送数据都是阻塞的，除非另一端已经准备好，这样就使得Goroutines同步变的更加的简单，而不需要显式的lock。所谓阻塞，也就是如果读取（value := <-ch）它将会被阻塞，直到有数据接收。其次，任何发送（ch<-5）将会被阻塞，直到数据被读出。无缓冲channel是在多个goroutine之间同步很棒的工具。
+>**`for i := range c`**能够不断的读取channel里面的数据，直到该channel被显式的关闭。上面代码我们看到可以显式的关闭channel，生产者通过内置函数`close`关闭channel。关闭channel之后就无法再发送任何数据了，在消费方可以通过语法`v, ok := <-ch`测试channel是否被关闭。如果ok返回false，那么说明channel已经没有任何数据并且已经被关闭。
+
+>**记住应该在生产者的地方关闭channel，而不是消费的地方去关闭它，这样容易引起panic**
+
+>**另外记住一点的就是channel不像文件之类的，不需要经常去关闭，只有当确实没有任何数据要发送，或者想显式的结束range循环之类才去close**
+
 
 ###select语句
 
-select语句
+如果存在多个channel的时候，我们Go里面提供的关键字`select`，可以监听channel上的数据流动。`select`默认是阻塞的，只有当监听的channel中有发送或接收可以进行时才会运行，当多个channel都准备好的时候，select是随机的选择一个执行的。
+
+有时候会出现goroutine阻塞的情况，为了避免整个程序进入阻塞,我们可以利用select来设置超时，通过如下的方式实现：
 
 	cccc := make(chan int)
 	oooo := make(chan bool)
@@ -800,3 +1181,36 @@ select语句
 	}
 	
 	<-oooo
+
+
+在`select`里面还有default语法，`select`其实就是类似switch的功能，default就是当监听的channel都没有准备好的时候，默认执行的（select不再阻塞等待channel）。
+
+	select {
+	case i := <-c:
+		// use i
+	default:
+		// 当c阻塞的时候执行这里
+	}
+
+### runtime goroutine
+runtime包中有几个处理goroutine的函数：
+
+- Goexit
+
+	退出当前执行的goroutine，但是defer函数还会继续调用
+	
+- Gosched
+
+	让出当前goroutine的执行权限，调度器安排其他等待的任务运行，并在下次某个时候从该位置恢复执行。
+
+- NumCPU
+
+	返回 CPU 核数量
+	
+- NumGoroutine
+
+	返回正在执行和排队的任务总数
+	
+- GOMAXPROCS
+
+	用来设置可以并行计算的CPU核数的最大值，并返回之前的值。
