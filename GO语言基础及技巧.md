@@ -733,7 +733,7 @@ goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一
 
 >这里有一篇Rob介绍的关于并发和并行的文章：http://concur.rspace.googlecode.com/hg/talk/concur.html#landing-slide
 
-###Channel用于同步<a name="#goconcurrent"></a>
+###Channel用于同步<a name="goconcurrent"></a>
 
 channel可以与Unix shell 中的双向管道做类比：可以通过它发送或者接收特定类型的值。
 
