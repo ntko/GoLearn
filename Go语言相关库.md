@@ -20,10 +20,10 @@
 * [https://github.com/choleraehyq/gofunctools](https://github.com/choleraehyq/gofunctools) 
 
 ##数据库
-* TiDB is a distributed SQL database compatible with MySQL protocol.Inspired by the design of Google F1, TiDB supports the best features of both traditional RDBMS and NoSQL.  
+* `TiDB` is a distributed SQL database compatible with MySQL protocol.Inspired by the design of Google F1, TiDB supports the best features of both traditional RDBMS and NoSQL.  
 	* **值得关注,尚未成熟.**
 
 	* [https://github.com/pingcap/tidb](https://github.com/pingcap/tidb) 
 
-* Your NoSQL database powered by Golang:`HouzuoGuo/tiedot` 
+* `HouzuoGuo/tiedot`是Golang语言写的NOSQL几乎唯一可用库
 	* [https://github.com/HouzuoGuo/tiedot](https://github.com/HouzuoGuo/tiedot)
