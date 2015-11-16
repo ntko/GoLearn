@@ -2,6 +2,65 @@
 * [build-web-application-with-golang ](https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md)  
 * [golang blog](http://blog.golang.org) 
 
+# 目录
+
+- 1.[命令速查](#命令速查)
+- 2.入门准备
+	- GOPATH设置
+	- 文档查看
+- 3.程序基础
+	- 程序入口
+		- main函数和init函数
+		- import
+	- 变量定义
+	- 常量定义示范
+	- 内置常规数据类型
+		- bool
+		- 数值类型
+		- 字符串
+		- 数组
+	- 内置高级数据类型
+		- 基础:方法集
+		- 错误类型
+		- Struct类型
+		- Pointer类型
+		- Function类型
+		- Interface类型
+		- Channel类型
+		- slice类型
+		- map类型 
+	- 程序语句
+		- if goto for switch
+	- 函数
+		- 变参
+		- 传值与传指针
+		- defer
+		- 函数作为值、类型(函数指针)
+		- Panic和Recover
+	- Method方法成员
+		- method可以被继承和重写
+- 4.一般语言技巧
+	- 零值
+	- 语言隐含规则
+	- 可赋值操作
+	- 错误类型的使用
+	- 分组声明
+	- iota枚举
+	- make、new操作
+- 5.高级技巧
+	- 类型断言及类型分支(Type assertions及Type switches)
+		- 类型断言
+		- 类型分支
+	- 反射(reflect)
+	- Go语言并发
+		- Channel用于同步
+		- Buffered Channels
+		- Range和Close
+		- select语句
+		- runtime goroutine
+
+
+
 #1.命令速查
 
   * go install pachage  //编译并安装包或者应用
@@ -36,7 +95,7 @@ $GOPATH 目录约定有三个子目录：
 
 GOPATH下的src目录就是接下来开发的主要目录，所有源码都放在这个目录下面，一般做法是一个目录一个项目，例如: $GOPATH/src/mymath 表示mymath这个应用包或者可执行应用，这个根据package是main还是其他来决定，main的话就是可执行应用，其他的话就是应用包。
 
-## 文档查看
+##文档查看
 
 如何查看相应package的文档呢？ 例如builtin包，那么执行 godoc builtin  如果是http包，那么执行 godoc net/http  查看某一个包里面的函数，那么执行 godoc fmt Printf  也可以查看相应的代码，执行 godoc -src fmt Printf 
 
@@ -425,7 +484,7 @@ interface类型定义了一组接口方法.interface类型的变量,可以存储
 
 #### Channel类型
 
-参考后面[Go语言并发部分](#goconcurrent)
+参考后面[Go语言并发部分.Channel用于同步](#Channel用于同步)
 
 #### slice类型
 
@@ -834,28 +893,6 @@ A value x is assignable to a variable of type T ("x is assignable to T") in any 
 * x is the predeclared identifier nil and T is a pointer, function, slice, map, channel, or interface type. 
 * x is an untyped constant representable by a value of type T. 
 
-
-## 修改字符串
-
-在Go中字符串是不可变的，例如下面的代码编译时会报错：cannot assign to s[0]
-
-	var s string = "hello"
-	s[0] = 'c'
-
-但如果真的想要修改怎么办呢？下面的代码可以实现：
-
-	s := "hello"
-	c := []byte(s)  // 将字符串 s 转换为 []byte 类型
-	c[0] = 'c'
-	s2 := string(c)  // 再转换回 string 类型
-	fmt.Printf("%s\n", s2)
-
-修改字符串也可写为：
-
-	s := "hello"
-	s = "c" + s[1:] // 字符串虽不能更改，但可进行切片操作
-	fmt.Printf("%s\n", s)
-
 ## 错误类型的使用
 
 此处暂缺
@@ -931,7 +968,7 @@ Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值
 
 ## 类型断言及类型分支(Type assertions及Type switches)
 
-### 类型断言
+#### 类型断言
 
 对于interface类型变量x,以及类型T:
 
@@ -962,7 +999,7 @@ Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值
 这时蒋产生一个附加的bool值.该布尔值标识断言是否成立.如果成立,v保存了T类型的x的值,如果不成立,v保存了T类型的0值.**此时将不会有运行时错误**.
 
 
-### 类型分支
+#### 类型分支
 
 x是一个interface{}类型, 如下类型分支代码: 
 
@@ -1044,7 +1081,7 @@ The type switch guard may be preceded by a simple statement, which executes befo
 
 ##Go语言并发
 
-###goroutine
+####goroutine
 
 goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一个线程管理器。goroutine通过`go`关键字实现，其实就是一个普通的函数。
 
@@ -1084,7 +1121,7 @@ goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一
 
 >这里有一篇Rob介绍的关于并发和并行的文章：http://concur.rspace.googlecode.com/hg/talk/concur.html#landing-slide
 
-###Channel用于同步<a name="goconcurrent"></a>
+####Channel用于同步
 
 channel通过发送和接收某种类型的值进行通讯的方式,提供了同步执行的机制.未初始化的channel类型的变量值为nil.可以被定义为双向和单向,且限定可以通过它发送或者接收的数据类型.可以与Unix shell 中的双向管道做类比。
 
@@ -1110,7 +1147,7 @@ channel通过操作符`<-`来接收和发送数据
 
 默认情况下，channel接收和发送数据都是阻塞的，除非另一端已经准备好，也就是如果读取（value := <-ch）它将会被阻塞，直到有数据接收。其次，任何发送（ch<-5）将会被阻塞，直到数据被读出。无缓冲channel是在多个goroutine之间同步很棒的工具。
 
-### Buffered Channels
+#### Buffered Channels
 
 上面我们介绍了默认的非缓存类型的channel，不过Go也允许指定channel的缓冲大小，`ch:= make(chan bool, 4)`，创建了可以存储4个元素的bool 型channel。在这个channel 中，前4个元素可以无阻塞的写入。当写入第5个元素时，代码将会阻塞，直到其他goroutine从channel 中读取一些元素，腾出空间。
 
@@ -1120,7 +1157,7 @@ channel通过操作符`<-`来接收和发送数据
 	value > 0 ! 缓冲（非阻塞，直到value 个元素）
 
 
-### Range和Close
+#### Range和Close
 
 可以通过range，像操作slice或者map一样操作缓存类型的channel，请看下面的例子
 
@@ -1154,7 +1191,7 @@ channel通过操作符`<-`来接收和发送数据
 >**另外记住一点的就是channel不像文件之类的，不需要经常去关闭，只有当确实没有任何数据要发送，或者想显式的结束range循环之类才去close**
 
 
-###select语句
+####select语句
 
 如果存在多个channel的时候，我们Go里面提供的关键字`select`，可以监听channel上的数据流动。`select`默认是阻塞的，只有当监听的channel中有发送或接收可以进行时才会运行，当多个channel都准备好的时候，select是随机的选择一个执行的。
 
@@ -1192,7 +1229,7 @@ channel通过操作符`<-`来接收和发送数据
 		// 当c阻塞的时候执行这里
 	}
 
-### runtime goroutine
+#### runtime goroutine
 runtime包中有几个处理goroutine的函数：
 
 - Goexit
