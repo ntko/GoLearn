@@ -51,13 +51,14 @@
 	- [类型断言及类型分支(Type assertons及Type switches)](#a5.1)
 		- [类型断言](#a5.1.1.1)
 		- [类型分支](#a5.1.1.2)
-	- [反射(reflect)](#a5.3)
+	- [反射(reflect)](#a5.2)
 	- [Go语言并发](#a5.3)
-		- [Channel用于同步](#a5.3.1.1)
-		- [Buffered Channels](#a5.3.1.2)
-		- [Range和Close](#a5.3.1.3)
-		- [select语句](#a5.3.1.4)
-		- [runtime goroutine](#a5.3.1.5)
+		- [goroutine](#a5.3.1.1)
+		- [Channel用于同步](#a5.3.1.2)
+		- [Buffered Channels](#a5.3.1.3)
+		- [Range和Close](#a5.3.1.4)
+		- [select语句](#a5.3.1.5)
+		- [runtime goroutine](#a5.3.1.6)
 
 #1.命令速查<a name="a1"></a>
 
@@ -81,7 +82,7 @@
 
 #2.入门准备<a name="a2"></a>
 
-##GOPATH设置
+##GOPATH设置<a name="a2.1"></a>
 
 go 命令依赖一个重要的环境变量：$GOPATH.GOPATH允许多个目录，当有多个目录时，请注意分隔符，多个目录的时候Windows是分号，Linux系统是冒号，当有多个GOPATH时，默认会将go get的内容放在第一个目录下。
 
@@ -93,18 +94,18 @@ $GOPATH 目录约定有三个子目录：
 
 GOPATH下的src目录就是接下来开发的主要目录，所有源码都放在这个目录下面，一般做法是一个目录一个项目，例如: $GOPATH/src/mymath 表示mymath这个应用包或者可执行应用，这个根据package是main还是其他来决定，main的话就是可执行应用，其他的话就是应用包。
 
-##文档查看
+##文档查看<a name="a2.2"></a>
 
 如何查看相应package的文档呢？ 例如builtin包，那么执行 godoc builtin  如果是http包，那么执行 godoc net/http  查看某一个包里面的函数，那么执行 godoc fmt Printf  也可以查看相应的代码，执行 godoc -src fmt Printf 
 
 通过命令在命令行执行 godoc -http=:端口号 比如 godoc -http=:8080 。然后在浏览器中打开 127.0.0.1:8080 ，你将会看到一个golang.org的本地copy版本，通过它你可以查询pkg文档等其它内容。如果你设置了GOPATH，在pkg分类下，不但会列出标准包的文档，还会列出你本地 GOPATH 中所有项目的相关文档。
 
 
-#3.程序基础
+#3.程序基础<a name="a3"></a>
 
-##程序入口
+##程序入口<a name="a3.1"></a>
 
-#### `main`函数和`init`函数
+#### `main`函数和`init`函数<a name="a3.1.1.1"></a>
 
 Go里面有两个保留的函数：`init`函数（能够应用于所有的`package`）和`main`函数（只能应用于`package main`）。这两个函数在定义时不能有任何的参数和返回值。
 
@@ -116,7 +117,7 @@ Go程序会自动调用`init()`和`main()`，所以你不需要在任何地方�
 
 程序的初始化和执行都起始于`main`包。如果`main`包还导入了其它的包，那么就会在编译时将它们依次导入。有时一个包会被多个包同时导入，那么它只会被导入一次.当一个包被导入时，如果该包还导入了其它的包，那么会先将其它包导入进来，然后再对这些包中的包级常量和变量进行初始化，接着执行`init`函数（如果有的话），依次类推。等所有被导入的包都加载完毕了，就会开始对`main`包中的包级常量和变量进行初始化，然后执行`main`包中的`init`函数（如果存在的话），最后执行`main`函数。下图详细地解释了整个执行过程：
 
-#### import
+#### import<a name="a3.1.1.2"></a>
 
 import这个命令用来导入包文件，而我们经常看到的方式参考如下：
 
@@ -174,7 +175,7 @@ import这个命令用来导入包文件，而我们经常看到的方式参考�
 	_操作其实是引入该包，而不直接使用包里面的函数，而是调用了该包里面的init函数。
 
 
-##变量定义
+##变量定义<a name="a3.2"></a>
 
 >**Go的变量定义,类型type在变量名称之后。**
 
@@ -210,7 +211,7 @@ Go对于已声明但未使用的变量会在编译阶段报错，比如下面的
 		var i int
 	}
 
-##常量定义示范
+##常量定义示范<a name="a3.3"></a>
 
 	const a = 2 + 3.0          // a == 5.0   (untyped floating-point constant)
 	const b = 15 / 4           // b == 3     (untyped integer constant)
@@ -230,9 +231,9 @@ Go对于已声明但未使用的变量会在编译阶段报错，比如下面的
 	const Δ = Σ + 2.0e-4       //            (untyped complex constant)
 	const Φ = iota*1i - 1/1i   //            (untyped complex constant)
 
-##内置常规数据类型
+##内置常规数据类型<a name="a3.4"></a>
 
-#### bool
+#### bool<a name="a3.4.1.1"></a>
 
 在Go中，布尔值的类型为`bool`，值是`true`或`false`，默认为`false`。
 
@@ -244,7 +245,7 @@ Go对于已声明但未使用的变量会在编译阶段报错，比如下面的
 		available = true    // 赋值操作
 	}
 
-#### 数值类型
+#### 数值类型<a name="a3.4.1.2"></a>
 
 整数类型有无符号和带符号两种。Go同时支持`int`和`uint`，这两种类型的长度相同，但具体长度取决于不同编译器的实现。Go里面也有直接定义好位数的类型：`rune`, `int8`, `int16`, `int32`, `int64`和`byte`, `uint8`, `uint16`, `uint32`, `uint64`。其中`rune`是`int32`的别称，`byte`是`uint8`的别称。
 
@@ -267,7 +268,7 @@ Go还支持复数。它的默认类型是`complex128`（64位实数+64位虚数�
 	fmt.Printf("Value is: %v", c)
 
 
-#### 字符串
+#### 字符串<a name="a3.4.1.3"></a>
 
 Go中的字符串都是采用`UTF-8`字符集编码。字符串是用一对双引号（`""`）或反引号（`` ` `` `` ` ``）括起来定义，它的类型是`string`。
 
@@ -297,7 +298,7 @@ Go中可以使用`+`操作符来连接两个字符串：
     hello
 		world
 
-#### 数组
+#### 数组<a name="a3.4.1.4"></a>
 `array`就是数组，它的定义方式如下：
 
 	var arr [n]type
@@ -325,13 +326,13 @@ Go支持嵌套数组：
 	// 上面的声明可以简化，直接忽略内部的类型
 	easyArray := [2][4]int{{1, 2, 3, 4}, {5, 6, 7, 8}}
 
-##内置高级数据类型
+##内置高级数据类型<a name="a3.5"></a>
 
-#### 基础:方法集
+#### 基础:方法集<a name="a3.5.1.1"></a>
 
 > **方法集是一个定义而不是类型.方法集,或者叫做成员方法,是一个类型的函数集合.需要注意的是,T的方法集,就是带有接收器T类型的方法,而其对应的指针类型\*T的方法集,则包括了接收器T和\*T的方法.**
 
-#### 错误类型
+#### 错误类型<a name="a3.5.1.2"></a>
 Go内置有一个`error`类型，专门用来处理错误信息，Go的`package`里面还专门有一个包`errors`来处理错误：
 
 	err := errors.New("emit macho dwarf: elf header corrupted")
@@ -339,7 +340,7 @@ Go内置有一个`error`类型，专门用来处理错误信息，Go的`package`
 		fmt.Print(err)
 	}
 
-#### Struct类型
+#### Struct类型<a name="a3.5.1.3"></a>
 
 直接看示例:
 
@@ -424,14 +425,14 @@ strcut的字段定义中,可以跟随一个可选的字符串tag标签.这个标
 	}
 
 
-#### Pointer类型
+#### Pointer类型<a name="a3.5.1.4"></a>
 
 一个示例就够了:
 
 	*Point
 	*[4]int
 
-#### Function类型
+#### Function类型<a name="a3.5.1.5"></a>
 
 >**(注:相当于C中的函数指针)**
 
@@ -448,7 +449,7 @@ function类型标识了具有相同参数和返回值的函数集合.未初始�
 	func(int, int, float64) (float64, *[]int)
 	func(n int) func(p *T)
 
-#### Interface类型
+#### Interface类型<a name="a3.5.1.6"></a>
 
 interface类型定义了一组接口方法.interface类型的变量,可以存储任何实现了该组接口方法的类型.且该类型就叫做实现了该接口.未初始化的Interface类型的变量值为nil.
 
@@ -480,11 +481,11 @@ interface类型定义了一组接口方法.interface类型的变量,可以存储
 		Lock()      // 错误: Lock not unique
 	}
 
-#### Channel类型
+#### Channel类型<a name="a3.5.1.7"></a>
 
-参考后面[Go语言并发部分.Channel用于同步](#Channel用于同步)
+参考后面[Go语言并发部分.Channel用于同步](#a5.3.1.2)
 
-#### slice类型
+#### slice类型<a name="a3.5.1.8"></a>
 
 `slice`是数组的引用类型。`slice`总是指向一个底层`array`，`slice`的声明也可以像`array`一样，只是不需要长度。
 
@@ -536,7 +537,7 @@ slice有一些简便的操作
 >**注意：`append`函数会改变`slice`所引用的数组的内容，从而影响到引用同一数组的其它`slice`。
 但当`slice`中没有剩余空间（即`(cap-len) == 0`）时，此时将动态分配新的数组空间。返回的`slice`数组指针将指向这个空间，而原数组的内容将保持不变；其它引用此数组的`slice`则不受影响。**
 
-#### map类型
+#### map类型<a name="a3.5.1.9"></a>
 
 `map`的格式为`map[keyType]valueType`
 
@@ -565,11 +566,11 @@ slice有一些简便的操作
 
 >**注意: `map`也是一种引用类型.`map`和其他基本型别不同，它不是thread-safe，在多个go-routine存取时，必须使用mutex lock机制。**
 
-##程序语句
+##程序语句<a name="a3.6"></a>
 
 ###流程控制
 
-####if
+####if<a name="a3.6.1.1"></a>
 
 * Go里面if条件判断语句中不需要括号
 * Go的if还允许在条件判断语句里面声明一个变量，这个变量的作用域只能在该条件逻辑块内.
@@ -582,11 +583,11 @@ slice有一些简便的操作
 		}
 
 
-#### goto
+#### goto<a name="a3.6.1.2"></a>
 
 用`goto`跳转到必须在当前函数内定义的标签,且标签名大小写敏感。
 
-#### for
+#### for<a name="a3.6.1.3"></a>
 Go里面最强大的一个控制逻辑就是`for`，它即可以用来循环读取数据，又可以当作`while`来控制逻辑，还能迭代操作。它的语法如下：(**注意同样不需要括号**)
 
 	for expression1; expression2; expression3 {
@@ -627,7 +628,7 @@ Go里面最强大的一个控制逻辑就是`for`，它即可以用来循环读�
 		}
 
 
-#### switch
+#### switch<a name="a3.6.1.4"></a>
 
 `switch`的语法如下:
 
@@ -648,7 +649,7 @@ Go里面最强大的一个控制逻辑就是`for`，它即可以用来循环读�
 
 * Go里面`switch`默认相当于每个`case`最后带有`break`，匹配成功后不会自动向下执行其他case，而是跳出整个`switch`, 但是可以使用`fallthrough`强制执行后面的case代码。
 
-## 函数
+## 函数<a name="a3.7"></a>
 
 函数是Go里面的核心设计，它通过关键字`func`来声明，它的格式如下：
 
@@ -685,7 +686,7 @@ Go里面最强大的一个控制逻辑就是`for`，它即可以用来循环读�
 
 而SumAndProduct直接返回了两个参数.
 
-#### 变参
+#### 变参<a name="a3.7.1.1"></a>
 
 	func myfunc(arg ...int) {}
 `arg ...int`告诉Go这个函数接受不定数量的参数。注意，这些参数的类型全部是`int`。在函数体中，变量`arg`是一个`int`的`slice`：
@@ -694,11 +695,11 @@ Go里面最强大的一个控制逻辑就是`for`，它即可以用来循环读�
 		fmt.Printf("And the number is: %d\n", n)
 	}
 
-#### 传值与传指针
+#### 传值与传指针<a name="a3.7.1.2"></a>
 
 Go语言中`channel`，`slice`，`map`这三种类型的实现机制类似指针，所以可以直接传递，而不用取地址后传递指针。（注：若函数需改变`slice`的长度，则仍需要取地址传递指针）
 
-#### defer
+#### defer<a name="a3.7.1.3"></a>
 
 Go语言中有种不错的设计，即延迟（defer）语句，你可以在函数中添加多个defer语句。当函数执行到最后时，这些defer语句会按照逆序执行,即采用后进先出模式，最后该函数返回。特别是当你在进行一些打开资源的操作时，遇到错误需要提前返回，在返回前你需要关闭相应的资源，不然很容易造成资源泄露等问题。示例：
 
@@ -714,7 +715,7 @@ Go语言中有种不错的设计，即延迟（defer）语句，你可以在函�
 		return true
 	}
 
-#### 函数作为值、类型(函数指针)
+#### 函数作为值、类型(函数指针)<a name="a3.7.1.4"></a>
 
 在Go中函数也是一种变量，我们可以通过`type`来定义它，它的类型就是所有拥有相同的参数，相同的返回值的一种类型
 
@@ -764,7 +765,7 @@ Go语言中有种不错的设计，即延迟（defer）语句，你可以在函�
 
 函数当做值和类型在我们写一些通用接口的时候非常有用。
 
-#### Panic和Recover
+#### Panic和Recover<a name="a3.7.1.5"></a>
 
 Go没有异常机制，它不能抛出异常，而是使用了`panic`和`recover`机制。
 
@@ -796,7 +797,7 @@ Recover
 		return
 	}
 
-##Method方法成员
+##Method方法成员<a name="a3.8"></a>
 
 method的语法如下：
 
@@ -816,7 +817,7 @@ method的语法如下：
 
 所以，你不用担心你是调用的指针的method还是不是指针的method，Go知道你要做的一切。
 
-#### method可以被继承和重写
+#### method可以被继承和重写<a name="a3.8.1.1"></a>
 
 	package main
 	import "fmt"
@@ -853,9 +854,9 @@ method的语法如下：
 上面的例子中，如果Employee想要实现自己的SayHi,在Employee上面定义一个method，重写匿名字段的方法即可。
 
 
-#4.一般语言技巧
+#4.一般语言技巧<a name="a4"></a>
 
-## 零值
+## 零值<a name="a4.1"></a>
 关于“零值”，所指并非是空值，而是一种“变量未填充前”的默认值，通常为0。
 此处罗列 部分类型 的 “零值”
 
@@ -871,14 +872,14 @@ method的语法如下：
 	bool    false
 	string  ""
 
-## 语言隐含规则
+## 语言隐含规则<a name="a4.2"></a>
 
 Go语言有一些默认的行为：    
 
 - 大写字母开头的变量是可导出的，也就是其它包可以读取的，是公用变量；小写字母开头的就是不可导出的，是私有变量。    
 - 大写字母开头的函数也是一样，相当于`class`中的带`public`关键词的公有函数；小写字母开头的就是有`private`关键词的私有函数。
 
-## 可赋值操作
+## 可赋值操作<a name="a4.3"></a>
 
 Assignability
 
@@ -891,11 +892,11 @@ A value x is assignable to a variable of type T ("x is assignable to T") in any 
 * x is the predeclared identifier nil and T is a pointer, function, slice, map, channel, or interface type. 
 * x is an untyped constant representable by a value of type T. 
 
-## 错误类型的使用
+## 错误类型的使用<a name="a4.4"></a>
 
 此处暂缺
 
-## 分组声明
+## 分组声明<a name="a4.5"></a>
 
 在Go语言中，同时声明多个常量、变量，或者导入多个包时，可采用分组的方式进行声明。
 
@@ -931,7 +932,7 @@ A value x is assignable to a variable of type T ("x is assignable to T") in any 
 		prefix string
 	)
 
-## iota枚举
+## iota枚举<a name="a4.6"></a>
 
 Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值是0，每调用一次加1：
 
@@ -950,7 +951,7 @@ Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值
 
 >除非被显式设置为其它值或`iota`，每个`const`分组的第一个常量被默认设置为它的0值，第二及后续的常量被默认设置为它前面那个常量的值，如果前面那个常量的值是`iota`，则它也被设置为`iota`。
 
-## make、new操作
+## make、new操作<a name="a4.7"></a>
 
 `make`用于内建类型（`map`、`slice` 和`channel`）的内存分配。`new`用于各种类型的内存分配。
 
@@ -962,11 +963,11 @@ Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值
 
 >`make`返回初始化后的（非零）值。
 
-#5.高级技巧
+#5.高级技巧<a name="a5"></a>
 
-## 类型断言及类型分支(Type assertions及Type switches)
+## 类型断言及类型分支(Type assertions及Type switches)<a name="a5.1"></a>
 
-#### 类型断言
+#### 类型断言<a name="a5.1.1.1"></a>
 
 对于interface类型变量x,以及类型T:
 
@@ -997,7 +998,7 @@ Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值
 这时蒋产生一个附加的bool值.该布尔值标识断言是否成立.如果成立,v保存了T类型的x的值,如果不成立,v保存了T类型的0值.**此时将不会有运行时错误**.
 
 
-#### 类型分支
+#### 类型分支<a name="a5.1.1.2"></a>
 
 x是一个interface{}类型, 如下类型分支代码: 
 
@@ -1046,7 +1047,7 @@ The type switch guard may be preceded by a simple statement, which executes befo
 
 **The "fallthrough" statement is not permitted in a type switch.** 
 
-## 反射(reflect)
+## 反射(reflect)<a name="a5.2"></a>
 
 直接看示例:
 
@@ -1077,9 +1078,9 @@ The type switch guard may be preceded by a simple statement, which executes befo
 	kind is float64: true
 	Value: 7.1
 
-##Go语言并发
+##Go语言并发<a name="a5.3"></a>
 
-####goroutine
+####goroutine<a name="a5.3.1.1"></a>
 
 goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一个线程管理器。goroutine通过`go`关键字实现，其实就是一个普通的函数。
 
@@ -1119,7 +1120,7 @@ goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一
 
 >这里有一篇Rob介绍的关于并发和并行的文章：http://concur.rspace.googlecode.com/hg/talk/concur.html#landing-slide
 
-####Channel用于同步
+####Channel用于同步<a name="a5.3.1.2"></a>
 
 channel通过发送和接收某种类型的值进行通讯的方式,提供了同步执行的机制.未初始化的channel类型的变量值为nil.可以被定义为双向和单向,且限定可以通过它发送或者接收的数据类型.可以与Unix shell 中的双向管道做类比。
 
@@ -1145,7 +1146,7 @@ channel通过操作符`<-`来接收和发送数据
 
 默认情况下，channel接收和发送数据都是阻塞的，除非另一端已经准备好，也就是如果读取（value := <-ch）它将会被阻塞，直到有数据接收。其次，任何发送（ch<-5）将会被阻塞，直到数据被读出。无缓冲channel是在多个goroutine之间同步很棒的工具。
 
-#### Buffered Channels
+#### Buffered Channels<a name="a5.3.1.3"></a>
 
 上面我们介绍了默认的非缓存类型的channel，不过Go也允许指定channel的缓冲大小，`ch:= make(chan bool, 4)`，创建了可以存储4个元素的bool 型channel。在这个channel 中，前4个元素可以无阻塞的写入。当写入第5个元素时，代码将会阻塞，直到其他goroutine从channel 中读取一些元素，腾出空间。
 
@@ -1155,7 +1156,7 @@ channel通过操作符`<-`来接收和发送数据
 	value > 0 ! 缓冲（非阻塞，直到value 个元素）
 
 
-#### Range和Close
+#### Range和Close<a name="a5.3.1.4"></a>
 
 可以通过range，像操作slice或者map一样操作缓存类型的channel，请看下面的例子
 
@@ -1189,7 +1190,7 @@ channel通过操作符`<-`来接收和发送数据
 >**另外记住一点的就是channel不像文件之类的，不需要经常去关闭，只有当确实没有任何数据要发送，或者想显式的结束range循环之类才去close**
 
 
-####select语句
+####select语句<a name="a5.3.1.5"></a>
 
 如果存在多个channel的时候，我们Go里面提供的关键字`select`，可以监听channel上的数据流动。`select`默认是阻塞的，只有当监听的channel中有发送或接收可以进行时才会运行，当多个channel都准备好的时候，select是随机的选择一个执行的。
 
@@ -1227,7 +1228,7 @@ channel通过操作符`<-`来接收和发送数据
 		// 当c阻塞的时候执行这里
 	}
 
-#### runtime goroutine
+#### runtime goroutine<a name="a5.3.1.6"></a>
 runtime包中有几个处理goroutine的函数：
 
 - Goexit
