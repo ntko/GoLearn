@@ -10,6 +10,7 @@
 * [http://www.open-open.com/lib/view/1396063913278](http://www.open-open.com/lib/view/1396063913278)
 
 ##非常棒的Go语言框架，库和软件集合：Awesome Go
+* [http://awesome-go.com/](http://awesome-go.com/)
 * [https://github.com/avelino/awesome-go](https://github.com/avelino/awesome-go)
 * [http://www.open-open.com/lib/view/open1442132093137.html](http://www.open-open.com/lib/view/open1442132093137.html)
 
@@ -18,6 +19,11 @@
 
 ##常用函数工具库
 * [https://github.com/choleraehyq/gofunctools](https://github.com/choleraehyq/gofunctools) 
+
+##网络相关
+
+* `abh/geodns`:Go实现的DNS服务器.[https://github.com/abh/geodns](https://github.com/abh/geodns)  
+* `miekg/dns`:Go DNS类库.[https://github.com/miekg/dns](https://github.com/miekg/dns)
 
 ##数据库
 * `TiDB` is a distributed SQL database compatible with MySQL protocol.Inspired by the design of Google F1, TiDB supports the best features of both traditional RDBMS and NoSQL.  
