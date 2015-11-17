@@ -14,6 +14,18 @@
 * [https://github.com/avelino/awesome-go](https://github.com/avelino/awesome-go)
 * [http://www.open-open.com/lib/view/open1442132093137.html](http://www.open-open.com/lib/view/open1442132093137.html)
 
+##web框架
+
+* [https://github.com/revel/revel)](https://github.com/revel/revel):A high productivity, full-stack web framework for the Go language.  
+* [https://github.com/go-martini/martini](https://github.com/go-martini/martini):Classy web framework for Go.建议用`negroni`代替.
+* [https://github.com/codegangsta/negroni](https://github.com/codegangsta/negroni):Idiomatic HTTP Middleware for Golang 
+* [https://github.com/astaxie/beego](https://github.com/astaxie/beego):beego is an open-source, high-performance web framework for the Go programming language.
+ 
+
+##命令行程序框架
+
+* [https://github.com/codegangsta/cli](https://github.com/codegangsta/cli)
+
 ##错误处理
 * [https://github.com/juju/errors](https://github.com/juju/errors)  
 
