@@ -14,13 +14,30 @@
 * [https://github.com/avelino/awesome-go](https://github.com/avelino/awesome-go)
 * [http://www.open-open.com/lib/view/open1442132093137.html](http://www.open-open.com/lib/view/open1442132093137.html)
 
-##web框架
+##web框架相关
+
+**有用的文档**  
+
+* [Architecture for a Golang Web App](https://larry-price.com/blog/2015/06/25/architecture-for-a-golang-web-app)
+* [Build You Own Web Framework In Go](https://www.nicolasmerouze.com/build-web-framework-golang/)
+
+**框架**  
 
 * [https://github.com/revel/revel)](https://github.com/revel/revel):A high productivity, full-stack web framework for the Go language.  
-* [https://github.com/go-martini/martini](https://github.com/go-martini/martini):Classy web framework for Go.建议用`negroni`代替.
-* [https://github.com/codegangsta/negroni](https://github.com/codegangsta/negroni):Idiomatic HTTP Middleware for Golang 
 * [https://github.com/astaxie/beego](https://github.com/astaxie/beego):beego is an open-source, high-performance web framework for the Go programming language.
  
+##MiddleWare
+
+* `codegangsta/negroni`:[https://github.com/codegangsta/negroni](https://github.com/codegangsta/negroni):Idiomatic HTTP Middleware for Golang 
+* [https://github.com/go-martini/martini](https://github.com/go-martini/martini):Classy web framework for Go.建议用`negroni`代替.
+
+##Routers
+
+* `julienschmidt/httprouter`:[https://github.com/julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)可以和`negroni`一起使用.示例:
+	* [My favorite Go multiplexer](http://www.peterbe.com/plog/my-favorite-go-multiplexer)
+* `go-zoo/bone`:[https://github.com/go-zoo/bone](https://github.com/go-zoo/bone)
+* `gorilla/mux`:[https://github.com/gorilla/mux](https://github.com/gorilla/mux)
+
 
 ##命令行程序框架
 
@@ -36,6 +53,8 @@
 
 * `abh/geodns`:Go实现的DNS服务器.[https://github.com/abh/geodns](https://github.com/abh/geodns)  
 * `miekg/dns`:Go DNS类库.[https://github.com/miekg/dns](https://github.com/miekg/dns)
+* `go-imap`:[https://github.com/mxk/go-imap](https://github.com/mxk/go-imap).
+	* 示例:[https://gist.github.com/ser1zw/dc0157b6a4fcc46fd160](https://gist.github.com/ser1zw/dc0157b6a4fcc46fd160)
 
 ##数据库
 * `TiDB` is a distributed SQL database compatible with MySQL protocol.Inspired by the design of Google F1, TiDB supports the best features of both traditional RDBMS and NoSQL.  
