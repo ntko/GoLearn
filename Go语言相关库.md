@@ -31,6 +31,8 @@
 * `codegangsta/negroni`:[https://github.com/codegangsta/negroni](https://github.com/codegangsta/negroni):Idiomatic HTTP Middleware for Golang 
 * [https://github.com/go-martini/martini](https://github.com/go-martini/martini):Classy web framework for Go.建议用`negroni`代替.
 
+>**框架的问题在于接口协议不统一.对开发者而言,很难找到可用的插件.**
+
 ##Routers
 
 * `julienschmidt/httprouter`:[https://github.com/julienschmidt/httprouter](https://github.com/julienschmidt/httprouter)可以和`negroni`一起使用.示例:
@@ -38,6 +40,10 @@
 * `go-zoo/bone`:[https://github.com/go-zoo/bone](https://github.com/go-zoo/bone)
 * `gorilla/mux`:[https://github.com/gorilla/mux](https://github.com/gorilla/mux)
 
+
+## Middleware和Router的关系如下:
+
+![](img/middleware.png)
 
 ##命令行程序框架
 
