@@ -127,6 +127,96 @@ Your code should compile and link fine. You will get a SIGSEGV in your applicati
 Until next time!
 
 
+## json相关
+
+	package main
+	
+	import (
+	    "encoding/json"
+	    "fmt"
+	)
+	
+	type Server struct {
+	    ServerName string
+	    ServerIP   string
+	}
+	
+	type Serverslice struct {
+	    Servers []Server
+	}
+	
+	func main() {
+	    var s Serverslice
+	    s.Servers = append(s.Servers, Server{ServerName: "Shanghai_VPN", ServerIP: "127.0.0.1"})
+	    s.Servers = append(s.Servers, Server{ServerName: "Beijing_VPN", ServerIP: "127.0.0.2"})
+	    b, err := json.Marshal(s)
+	    if err != nil {
+	        fmt.Println("json err:", err)
+	    }
+	    fmt.Println(string(b))
+	}
+
+输出如下内容：
+	
+	 {"Servers":[{"ServerName":"Shanghai_VPN","ServerIP":"127.0.0.1"},{"ServerName":"Beijing_VPN","ServerIP":"127.0.0.2"}]}
+
+我们看到上面的输出字段名的首字母都是大写的，如果你想用小写的首字母怎么办呢？**把结构体的字段名改成首字母小写的是不行的！**
+
+JSON输出的时候必须注意，只有导出的字段才会被输出，如果修改字段名， 必须通过struct tag定义来实现：
+
+	type Server struct {
+	    ServerName string `json:"serverName"`
+	    ServerIP   string `json:"serverIP"`
+	}
+	
+	type Serverslice struct {
+	    Servers []Server `json:"servers"`
+	}
+
+通过修改上面的结构体定义，输出的JSON串就和我们最开始定义的JSON串保持一致了。
+
+针对JSON的输出，我们在定义struct tag的时候需要注意的几点是:
+
+* 字段的tag是 "-" ，那么这个字段不会输出到JSON
+* tag中带有自定义名称，那么这个自定义名称会出现在JSON的字段名中，例如上面例子中serverName
+* tag中如果带有 "omitempty" 选项，那么如果该字段值为空，就不会输出到JSON串中
+* 如果字段类型是bool, string, int, int64等，而tag中带有 ",string" 选项，那么这个字段在输出到JSON的时候会把该字段对应的值转换成JSON字符串
+
+举例来说：
+	
+	type Server struct {
+	    // ID 不会导出到JSON中
+	    ID int `json:"-"`
+	
+	    // ServerName 的值会进行二次JSON编码
+	    ServerName  string `json:"serverName"`
+	    ServerName2 string `json:"serverName2,string"`
+	
+	    // 如果 ServerIP 为空，则不输出到JSON串中
+	    ServerIP   string `json:"serverIP,omitempty"`
+	}
+	
+	s := Server {
+	    ID:         3,
+	    ServerName:  `Go "1.0" `,
+	    ServerName2: `Go "1.0" `,
+	    ServerIP:   ``,
+	}
+	b, _ := json.Marshal(s)
+	os.Stdout.Write(b)
+
+会输出以下内容：
+
+	{"serverName":"Go \"1.0\" ","serverName2":"\"Go \\\"1.0\\\" \""}
+
+Marshal函数只有在转换成功的时候才会返回数据，在转换的过程中我们需要注意几点：
+
+* JSON对象只支持string作为key，所以要编码一个map，那么必须是map[string]T这种类型(T是Go语言中任意的类型)
+* Channel, complex和function是不能被编码成JSON的
+* 嵌套的数据是不能编码的，不然会让JSON编码进入死循环
+* 指针在编码的时候会输出指针指向的内容，而空指针会输出null
+
+
 
 ## 修改字符串
 
@@ -233,3 +323,62 @@ func returnsError() error {
 这回输出结果变成了：“found MyError: foo error”。 
 
 也许你会认为这不全是错误处理的坑，和switch case的匹配顺序有关，但不可否认的是有些人会这么去写代码，一旦这么写，坑就踩到了。因此对于通过switch case来判定error type的情况，将error这个“通用”类型放在后面或去掉。
+
+## 不需要web框架,只需要库
+
+### 示例 Gzip所有输出:
+
+	type gzipResponseWriter struct {
+	  io.Writer
+	  http.ResponseWriter
+	}
+	
+	func (w gzipResponseWriter) Write(b []byte) (int, error) {
+	  return w.Writer.Write(b)
+	}
+	
+	func makeGzipHandler(fn http.HandlerFunc) http.HandlerFunc {
+	  return func(w http.ResponseWriter, r *http.Request) {
+	    if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+	      fn(w, r)
+	      return
+	    }
+	    w.Header().Set("Content-Encoding", "gzip")
+	      gz := gzip.NewWriter(w)
+	      defer gz.Close()
+	      fn(gzipResponseWriter{Writer: gz, ResponseWriter: w}, r)
+	    }
+	}
+
+>INTERFACES
+
+	type Handler interface {
+	  ServeHTTP(ResponseWriter, *Request)
+	}
+
+>Just pass in your own Handler and gzip all requests with Accept-Encoding: gzip You can also do some other useful stuff in there...
+
+>USEFUL STUFF...
+
+	func (s *server) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	  // Log every request...
+	  log.Printf("%s %s %s %s", req.Proto, req.Method, req.RemoteAddr, req.URL)
+	
+	  // Track request latency to StatHat...
+	  defer func(t time.Time) {
+	    name := fmt.Sprintf("MyServer[%s][%s]", req.Method, req.URL.Path)
+	    stathat.PostEZValue(name, "...", time.Since(t).Seconds()*1000)
+	  }(time.Now())
+	  
+	  ... gzip, let the muxer do its thing.
+	}
+
+###更多关于GZIP
+
+* `Gzip Performance for Go Webservers`:
+	* [https://blog.klauspost.com/gzip-performance-for-go-webservers/](https://blog.klauspost.com/gzip-performance-for-go-webservers/)
+	
+相关的资源:
+
+* [https://github.com/xi2/httpgzip](https://github.com/xi2/httpgzip)
+* [https://github.com/klauspost/compress](https://github.com/klauspost/compress)
