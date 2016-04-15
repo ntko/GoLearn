@@ -99,6 +99,7 @@ Package svc provides everything required to build Windows service.
 ##开发工具
 
 * [https://github.com/gogits/gogs](https://github.com/gogits/gogs):Go语言开发的Git service
+* [https://github.com/laher/goxc](https://github.com/laher/goxc):Go语言跨平台编译
 
 ##错误处理
 * [https://github.com/juju/errors](https://github.com/juju/errors)  
