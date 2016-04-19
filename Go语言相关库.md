@@ -9,6 +9,9 @@
 * **[www.jqwidgets.com](www.jqwidgets.com)**
 * [http://www.zebkit.com/](http://www.zebkit.com/):基于Canvas的
 * [https://jimmyfrasche.github.io/go-reflection-codex/](https://jimmyfrasche.github.io/go-reflection-codex/)go反射参考
+* [http://www.evanlin.com/til-2016-03-29/](http://www.evanlin.com/til-2016-03-29/)把http.response.body 在關閉前先清乾淨可以達到重複使用增加四倍速度 
+* [https://ngrok.com/](https://ngrok.com/)Secure tunnels to localhost
+* [https://github.com/inconshreveable/ngrok](https://github.com/inconshreveable/ngrok)
 
 >工作平台:
 >
@@ -144,3 +147,5 @@ Package svc provides everything required to build Windows service.
 
 * `HouzuoGuo/tiedot`是Golang语言写的NOSQL几乎唯一可用库
 	* [https://github.com/HouzuoGuo/tiedot](https://github.com/HouzuoGuo/tiedot)
+* https://github.com/allegro/bigcache
+ 	* [https://github.com/allegro/bigcache](https://github.com/allegro/bigcache)
