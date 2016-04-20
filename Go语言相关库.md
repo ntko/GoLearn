@@ -147,5 +147,5 @@ Package svc provides everything required to build Windows service.
 
 * `HouzuoGuo/tiedot`是Golang语言写的NOSQL几乎唯一可用库
 	* [https://github.com/HouzuoGuo/tiedot](https://github.com/HouzuoGuo/tiedot)
-* https://github.com/allegro/bigcache
+* `https://github.com/allegro/bigcache`Go语言的大数据缓存实现
  	* [https://github.com/allegro/bigcache](https://github.com/allegro/bigcache)
