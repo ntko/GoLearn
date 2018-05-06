@@ -1,4 +1,4 @@
-###Go 相关资源
+### Go 相关资源
 * [build-web-application-with-golang ](https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md)  
 * [golang blog](http://blog.golang.org) 
 
@@ -103,7 +103,7 @@ GOPATH下的src目录就是接下来开发的主要目录，所有源码都放�
 
 # 3.程序基础<a name="a3"></a>
 
-##程序入口<a name="a3.1"></a>
+## 程序入口<a name="a3.1"></a>
 
 #### `main`函数和`init`函数<a name="a3.1.1.1"></a>
 
@@ -231,7 +231,7 @@ Go对于已声明但未使用的变量会在编译阶段报错，比如下面的
 	const Δ = Σ + 2.0e-4       //            (untyped complex constant)
 	const Φ = iota*1i - 1/1i   //            (untyped complex constant)
 
-##内置常规数据类型<a name="a3.4"></a>
+## 内置常规数据类型<a name="a3.4"></a>
 
 #### bool<a name="a3.4.1.1"></a>
 
@@ -1120,7 +1120,7 @@ goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一
 
 >这里有一篇Rob介绍的关于并发和并行的文章：http://concur.rspace.googlecode.com/hg/talk/concur.html#landing-slide
 
-####Channel用于同步<a name="a5.3.1.2"></a>
+#### Channel用于同步<a name="a5.3.1.2"></a>
 
 channel通过发送和接收某种类型的值进行通讯的方式,提供了同步执行的机制.未初始化的channel类型的变量值为nil.可以被定义为双向和单向,且限定可以通过它发送或者接收的数据类型.可以与Unix shell 中的双向管道做类比。
 
