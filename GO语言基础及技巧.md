@@ -1,4 +1,4 @@
-###Go相关资源
+###Go 相关资源
 * [build-web-application-with-golang ](https://github.com/astaxie/build-web-application-with-golang/blob/master/zh/preface.md)  
 * [golang blog](http://blog.golang.org) 
 
@@ -60,7 +60,7 @@
 		- [select语句](#a5.3.1.5)
 		- [runtime goroutine](#a5.3.1.6)
 
-#1.命令速查<a name="a1"></a>
+# 1.命令速查<a name="a1"></a>
 
   * go install pachage  //编译并安装包或者应用
   * go get github.com/astaxie/beedb  //获取远程包
@@ -80,7 +80,7 @@
 
 
 
-#2.入门准备<a name="a2"></a>
+# 2.入门准备<a name="a2"></a>
 
 ##GOPATH设置<a name="a2.1"></a>
 
@@ -101,7 +101,7 @@ GOPATH下的src目录就是接下来开发的主要目录，所有源码都放�
 通过命令在命令行执行 godoc -http=:端口号 比如 godoc -http=:8080 。然后在浏览器中打开 127.0.0.1:8080 ，你将会看到一个golang.org的本地copy版本，通过它你可以查询pkg文档等其它内容。如果你设置了GOPATH，在pkg分类下，不但会列出标准包的文档，还会列出你本地 GOPATH 中所有项目的相关文档。
 
 
-#3.程序基础<a name="a3"></a>
+# 3.程序基础<a name="a3"></a>
 
 ##程序入口<a name="a3.1"></a>
 
@@ -175,7 +175,7 @@ import这个命令用来导入包文件，而我们经常看到的方式参考�
 	_操作其实是引入该包，而不直接使用包里面的函数，而是调用了该包里面的init函数。
 
 
-##变量定义<a name="a3.2"></a>
+## 变量定义<a name="a3.2"></a>
 
 >**Go的变量定义,类型type在变量名称之后。**
 
@@ -211,7 +211,7 @@ Go对于已声明但未使用的变量会在编译阶段报错，比如下面的
 		var i int
 	}
 
-##常量定义示范<a name="a3.3"></a>
+## 常量定义示范<a name="a3.3"></a>
 
 	const a = 2 + 3.0          // a == 5.0   (untyped floating-point constant)
 	const b = 15 / 4           // b == 3     (untyped integer constant)
@@ -326,7 +326,7 @@ Go支持嵌套数组：
 	// 上面的声明可以简化，直接忽略内部的类型
 	easyArray := [2][4]int{{1, 2, 3, 4}, {5, 6, 7, 8}}
 
-##内置高级数据类型<a name="a3.5"></a>
+## 内置高级数据类型<a name="a3.5"></a>
 
 #### 基础:方法集<a name="a3.5.1.1"></a>
 
@@ -566,11 +566,11 @@ slice有一些简便的操作
 
 >**注意: `map`也是一种引用类型.`map`和其他基本型别不同，它不是thread-safe，在多个go-routine存取时，必须使用mutex lock机制。**
 
-##程序语句<a name="a3.6"></a>
+## 程序语句<a name="a3.6"></a>
 
-###流程控制
+### 流程控制
 
-####if<a name="a3.6.1.1"></a>
+#### if<a name="a3.6.1.1"></a>
 
 * Go里面if条件判断语句中不需要括号
 * Go的if还允许在条件判断语句里面声明一个变量，这个变量的作用域只能在该条件逻辑块内.
@@ -797,7 +797,7 @@ Recover
 		return
 	}
 
-##Method方法成员<a name="a3.8"></a>
+## Method方法成员<a name="a3.8"></a>
 
 method的语法如下：
 
@@ -854,7 +854,7 @@ method的语法如下：
 上面的例子中，如果Employee想要实现自己的SayHi,在Employee上面定义一个method，重写匿名字段的方法即可。
 
 
-#4.一般语言技巧<a name="a4"></a>
+# 4.一般语言技巧<a name="a4"></a>
 
 ## 零值<a name="a4.1"></a>
 关于“零值”，所指并非是空值，而是一种“变量未填充前”的默认值，通常为0。
@@ -963,7 +963,7 @@ Go里面的关键字`iota`，可以在声明`enum`时采用，它默认开始值
 
 >`make`返回初始化后的（非零）值。
 
-#5.高级技巧<a name="a5"></a>
+# 5.高级技巧<a name="a5"></a>
 
 ## 类型断言及类型分支(Type assertions及Type switches)<a name="a5.1"></a>
 
@@ -1078,9 +1078,9 @@ The type switch guard may be preceded by a simple statement, which executes befo
 	kind is float64: true
 	Value: 7.1
 
-##Go语言并发<a name="a5.3"></a>
+## Go语言并发<a name="a5.3"></a>
 
-####goroutine<a name="a5.3.1.1"></a>
+#### goroutine<a name="a5.3.1.1"></a>
 
 goroutine是Go并行设计的核心。goroutine是通过Go的runtime管理的一个线程管理器。goroutine通过`go`关键字实现，其实就是一个普通的函数。
 
@@ -1190,7 +1190,7 @@ channel通过操作符`<-`来接收和发送数据
 >**另外记住一点的就是channel不像文件之类的，不需要经常去关闭，只有当确实没有任何数据要发送，或者想显式的结束range循环之类才去close**
 
 
-####select语句<a name="a5.3.1.5"></a>
+#### select语句<a name="a5.3.1.5"></a>
 
 如果存在多个channel的时候，我们Go里面提供的关键字`select`，可以监听channel上的数据流动。`select`默认是阻塞的，只有当监听的channel中有发送或接收可以进行时才会运行，当多个channel都准备好的时候，select是随机的选择一个执行的。
 
